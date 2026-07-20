@@ -154,7 +154,6 @@ body:not(.is-collapsed) .menu-btn{
   padding:14px 0px;
   border-radius:0 0 var(--radius) var(--radius);
   transition:background .15s var(--ease)}
-.hcard:hover .hcard__bar{background:color-mix(in srgb,var(--surface) 60%,var(--bg))}
 .hcard__title{font-size:14px;color:var(--text)}
 .hcard__sub{font-size:12px;color:var(--muted)}
 .hcard:hover .hcard__sub{color:var(--text)}
