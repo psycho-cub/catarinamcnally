@@ -562,3 +562,11 @@ body.is-collapsed .projbar{left:0}
 /* the persistent shell (sidebar + nav) shouldn't flicker between pages */
 .sidebar,.nav{ view-transition-name: shell; }
 ::view-transition-group(shell){ animation:none; }
+
+/* first paint after a page load: place the sidebar in its remembered position
+   without animating into it */
+body.no-anim .sidebar,
+body.no-anim .main,
+body.no-anim .nav__name,
+body.no-anim .menu-btn,
+body.no-anim .projbar{transition:none !important}
