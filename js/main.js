@@ -188,13 +188,41 @@ function reveal(sel){
 }
 
 /* ---------- sidebar collapse + shared header behaviour ---------- */
+/* Was the sidebar left open on the previous page? Falls back to open on
+   desktop / closed on mobile the very first time. */
+function sidebarShouldBeOpen(){
+  let saved = null;
+  try { saved = localStorage.getItem('sidebar'); } catch(e){}
+  if(saved === 'open')   return true;
+  if(saved === 'closed') return false;
+  return !window.matchMedia('(max-width:860px)').matches;
+}
+
+/* Apply the saved state immediately — this script sits at the end of <body>,
+   so doing it here (rather than waiting for DOM-ready) means the sidebar is
+   already in the right position on the first paint, with no visible slide. */
+(function applySidebarEarly(){
+  if(!document.body) return;
+  if(!sidebarShouldBeOpen()) document.body.classList.add('is-collapsed');
+  document.body.classList.add('no-anim');          // suppress the transition once
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ document.body.classList.remove('no-anim'); });
+  });
+})();
+
 function initHeader(){
   const isNarrow = () => window.matchMedia('(max-width:860px)').matches;
-  function setSidebar(open){
+  function setSidebar(open, remember){
     $('body').toggleClass('is-collapsed', !open);
     $('#menu-btn').attr('aria-expanded', open);
+    // remember the choice so the next page opens the same way
+    if(remember !== false){
+      try { localStorage.setItem('sidebar', open ? 'open' : 'closed'); } catch(e){}
+    }
   }
-  setSidebar(!isNarrow());
+  // restore the state from the last page (default: open on desktop, closed on
+  // mobile). Passing `false` means "don't re-save what we just read".
+  setSidebar(sidebarShouldBeOpen(), false);
   $('#menu-btn').on('click', () => setSidebar(true));
   $('#sidebar-close, #scrim').on('click', () => setSidebar(false));
   $('.theme-toggle').on('click', () => setTheme(theme === 'dark' ? 'light' : 'dark'));
