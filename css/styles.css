@@ -110,7 +110,9 @@ body.is-collapsed .main{margin-left:0}
 body:not(.is-collapsed) .nav__name{
   opacity:0;pointer-events:none;transform:translate(-50%,-50%) translateY(-3px);transition-delay:0s}
 .nav__left{display:flex;align-items:center;gap:16px}
-.nav__links{display:flex;gap:16px}
+.nav__links{display:flex; gap:16px}
+.nav__links li { padding:3px 2px;
+               background-color: var(--sidebar-bg) }
 
 /* menu button — only exists while the sidebar is away.
    When the panel opens, this collapses out and the CLOSE button inside takes over. */
