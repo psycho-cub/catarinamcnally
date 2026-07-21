@@ -35,12 +35,21 @@ function placeholder(ratio, label, frame){
     'text-anchor="middle" dominant-baseline="middle">'+caption+'</text></svg>';
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
+/* Read an image attribute from the <img> itself, or — for convenience — from
+   its wrapping .card__frame / .hcard__frame or the card link. That way it
+   doesn't matter which of those you put data-img / data-imgs on. */
+function imgAttr($img, name){
+  const own = $img.attr(name);
+  if(own) return own;
+  const near = $img.closest('[' + name + ']');
+  return near.length ? near.attr(name) : null;
+}
 function imageFor($img){
-  const real = $img.attr('data-img');
+  const real = imgAttr($img, 'data-img');
   return real ? real : placeholder($img.data('ph'), $img.data('ph-label'));
 }
 function framesFor($img, count){
-  const list = ($img.attr('data-imgs') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const list = (imgAttr($img, 'data-imgs') || '').split(',').map(s => s.trim()).filter(Boolean);
   if(list.length) return list;
   const ratio = $img.data('ph'), label = $img.data('ph-label');
   const out = [];
@@ -52,6 +61,17 @@ function paintPlaceholders(){
 }
 
 /* ---------- scramble text ---------- */
+/* The text an element should settle back to. Captured from the page the first
+   time it's needed, so whatever you type in the HTML is what the scramble
+   resolves to — there's no attribute to keep in sync. (data-final is still
+   honoured if present, but it's optional.) */
+function origText(el){
+  if(el._final == null){
+    el._final = (el.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+  return el._final;
+}
+
 const SCRAMBLE_CHARS = '!<>-_\\/[]{}—=+*^?#________';
 function scrambleText(el, finalText, opts){
   opts = opts || {};
@@ -175,7 +195,7 @@ function initHeader(){
   $(document).on('mouseenter', '.scram', function(){
     if(this._origHTML == null) this._origHTML = this.innerHTML;
     const short = this.getAttribute('data-short');
-    const full  = this.getAttribute('data-final');
+    const full  = origText(this);
     const target = (short && isNarrow()) ? short : full;
     scrambleText(this, target || this.textContent);
   }).on('mouseleave', '.scram', function(){
@@ -301,32 +321,32 @@ function initCardHover(){
   $(document).on('mouseenter', '.card', function(){
     if($(this).hasClass('card--soon') || $(this).hasClass('card--locked')) return;
     const $c = $(this).find('.card__client'), $t = $(this).find('.card__title');
-    if($c.length) scrambleText($c[0], $c.data('final') || $c.text());
-    if($t.length) scrambleText($t[0], $t.data('final') || $t.text());
+    if($c.length) scrambleText($c[0], origText($c[0]));
+    if($t.length) scrambleText($t[0], origText($t[0]));
     startSlideshow(this);
   }).on('mouseleave', '.card', function(){
     stopSlideshow(this);
     const $c = $(this).find('.card__client'), $t = $(this).find('.card__title');
-    if($c.length){ if($c[0]._scrambleRAF) cancelAnimationFrame($c[0]._scrambleRAF); $c.text($c.data('final') || $c.text()); }
-    if($t.length){ if($t[0]._scrambleRAF) cancelAnimationFrame($t[0]._scrambleRAF); $t.text($t.data('final') || $t.text()); }
+    if($c.length){ if($c[0]._scrambleRAF) cancelAnimationFrame($c[0]._scrambleRAF); $c.text(origText($c[0])); }
+    if($t.length){ if($t[0]._scrambleRAF) cancelAnimationFrame($t[0]._scrambleRAF); $t.text(origText($t[0])); }
   });
   $(document).on('mouseenter', '.hcard', function(){
     startSlideshow(this);
-    $(this).find('.scram').each(function(){ scrambleText(this, $(this).data('final') || this.textContent); });
+    $(this).find('.scram').each(function(){ scrambleText(this, origText(this)); });
   }).on('mouseleave', '.hcard', function(){
     stopSlideshow(this);
     $(this).find('.scram').each(function(){
       if(this._scrambleRAF) cancelAnimationFrame(this._scrambleRAF);
       if(this._origHTML != null) this.innerHTML = this._origHTML;
-      else this.textContent = $(this).data('final') || this.textContent;
+      else this.textContent = origText(this);
     });
   });
   $(document).on('mouseenter', '#next-link', function(){
-    $(this).find('.scram').each(function(){ scrambleText(this, $(this).data('final') || this.textContent); });
+    $(this).find('.scram').each(function(){ scrambleText(this, origText(this)); });
   }).on('mouseleave', '#next-link', function(){
     $(this).find('.scram').each(function(){
       if(this._scrambleRAF) cancelAnimationFrame(this._scrambleRAF);
-      this.textContent = $(this).data('final') || this.textContent;
+      this.textContent = origText(this);
     });
   });
 }
@@ -406,16 +426,104 @@ function initShuffle(){
   });
 }
 
+/* ---------- preloader ----------
+   Blocks on the images you can actually SEE (the card stills), then reveals
+   the page and quietly warms the hover-slideshow frames in the background.
+   Waiting on every frame up front would mean staring at a counter while
+   100+ files download; this way the site appears fast and hovering is still
+   instant by the time you get there.
+
+   Fail-safes, because a stuck preloader means an invisible website:
+     · a broken image counts as done, it can't hang the queue
+     · a hard timeout reveals the page regardless
+     · window 'load' reveals it too
+     · and styles.css fades it out on its own even if this script never runs */
+function preloadImages(urls, onDone){
+  const list = Array.from(new Set(urls)).filter(Boolean);
+  if(!list.length){ if(onDone) onDone(0, 0); return; }
+  let done = 0;
+  list.forEach(function(url){
+    const img = new Image();
+    img.onload = img.onerror = function(){
+      done++;
+      if(onDone) onDone(done, list.length);
+    };
+    img.src = url;
+  });
+}
+
+/* every hover-slideshow frame on the page (not needed for first paint) */
+function slideshowFrames(){
+  const out = [];
+  $('img').each(function(){
+    (imgAttr($(this), 'data-imgs') || '').split(',').map(function(s){ return s.trim(); })
+      .filter(Boolean).forEach(function(u){ out.push(u); });
+  });
+  return out;
+}
+
+function hidePreloader(){
+  const el = document.getElementById('preloader');
+  document.body.classList.remove('is-loading');
+  if(!el || el.dataset.done) return;
+  el.dataset.done = '1';
+  el.classList.add('is-done');
+  setTimeout(function(){ if(el.parentNode) el.remove(); }, 500);
+}
+
+function initPreloader(done){
+  const MAX_WAIT = 6000;
+  let finished = false;
+  function finish(){
+    if(finished) return;
+    finished = true;
+    hidePreloader();
+    try { done(); } catch(e){ console.error(e); }
+    // now warm the hover frames in the background — nothing waits on this
+    preloadImages(slideshowFrames());
+  }
+
+  // the images already on screen
+  const visible = [];
+  $('img').each(function(){
+    const src = $(this).attr('src');
+    if(src && src.indexOf('data:') !== 0) visible.push(src);
+  });
+
+  const $num = $('#preloader-num');
+  if(!visible.length){ finish(); return; }
+  preloadImages(visible, function(loaded, total){
+    if($num.length) $num.text(Math.round(loaded / total * 100));
+    if(loaded >= total) finish();
+  });
+
+  setTimeout(finish, MAX_WAIT);            // never hang
+  $(window).on('load', finish);            // backstop
+}
+
 /* ===================== BOOT ===================== */
+/* Each step is isolated: if one throws, the rest still run and — crucially —
+   the preloader still gets dismissed, so a bug can never hide the whole site. */
+function safely(label, fn){
+  try { fn(); } catch(e){ console.error('[' + label + ']', e); }
+}
+
 $(function(){
-  initTheme();
-  initHeader();
-  initLock();
-  initCardHover();
-  initAccordion();
-  initClock();
-  initShuffle();
-  paintPlaceholders();
-  reveal('.card');
-  initProjectPage();
+  safely('theme',     initTheme);
+  safely('header',    initHeader);
+  safely('lock',      initLock);
+  safely('cardHover', initCardHover);
+  safely('accordion', initAccordion);
+  safely('clock',     initClock);
+  safely('shuffle',   initShuffle);
+  safely('images',    paintPlaceholders);   // resolves data-img -> src
+
+  initPreloader(function(){
+    safely('reveal',  function(){ reveal('.card'); });
+    safely('project', initProjectPage);
+  });
 });
+
+/* last-ditch: if anything above failed before the preloader even started,
+   make sure the overlay still goes away once the page has loaded */
+window.addEventListener('load', function(){ setTimeout(hidePreloader, 100); });
