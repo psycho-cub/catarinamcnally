@@ -2,6 +2,15 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
+<script>
+/* Set the theme BEFORE the page paints, otherwise a dark-mode visitor sees a
+   white flash on every navigation while the stylesheet loads with the default. */
+(function(){try{
+  var t=localStorage.getItem('theme');
+  if(!t)t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+}catch(e){}})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Client One — Placeholder Project · Catarina McNally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -104,7 +113,7 @@
   <div class="nav__left">
     <button class="menu-btn" id="menu-btn" aria-expanded="true" aria-controls="sidebar">
       <span class="menu-btn__bars" aria-hidden="true"><i></i><i></i></span>
-      <span class="scram" data-final="Info">Info</span>
+      <span class="scram" data-final="About">About</span>
     </button>
     <ul class="nav__links">
       <li><a href="work.html" data-nav="work"><span class="scram" data-final="Selected Work" data-short="Work"><span class="lbl-long">Selected </span>Work</span></a></li>
@@ -146,46 +155,45 @@
       </div>
     </header>
     <div class="media-grid" id="media">
-      
       <figure class="media--full media">
-        <img data-ph="16:7" data-ph-label="01" src="images/work/ppf-proj-1.webp" alt="">
-      </figure>
-      
-      <figure class="media--half media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="4:3" data-ph-label="02" alt="">
+        <img data-ph="16:7" data-ph-label="01" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--half media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="4:3" data-ph-label="03" alt="">
+        <img data-ph="4:3" data-ph-label="02" alt="" loading="lazy" decoding="async">
+      </figure>
+      <figure class="media--half media">
+        <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
+        <img data-ph="4:3" data-ph-label="03" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--unit media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="1:1" data-ph-label="04" alt="">
+        <img data-ph="1:1" data-ph-label="04" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--unit media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="1:1" data-ph-label="05" alt="">
+        <img data-ph="1:1" data-ph-label="05" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--unit media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="1:1" data-ph-label="06" alt="">
+        <img data-ph="1:1" data-ph-label="06" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--unit media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="1:1" data-ph-label="07" alt="">
+        <img data-ph="1:1" data-ph-label="07" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--tall media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="3:4" data-ph-label="08" alt="">
+        <img data-ph="3:4" data-ph-label="08" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--half media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="4:3" data-ph-label="09" alt="">
+        <img data-ph="4:3" data-ph-label="09" alt="" loading="lazy" decoding="async">
       </figure>
       <figure class="media--full media">
         <!-- swap for a real file:  <img src="images/your.jpg" alt="">   or   <video src="images/your.mp4" autoplay muted loop playsinline></video> -->
-        <img data-ph="16:7" data-ph-label="10" alt="">
+        <img data-ph="16:7" data-ph-label="10" alt="" loading="lazy" decoding="async">
       </figure>
     </div>
     <nav class="project__next">
