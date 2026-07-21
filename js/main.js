@@ -98,8 +98,40 @@ function scrambleText(el, finalText, opts){
 }
 
 /* ---------- hover slideshow ---------- */
+/* ---------- hover motion ----------
+   A card can animate on hover in one of two ways:
+
+     data-video="images/clip.mp4"   ← preferred. One small looping video.
+     data-imgs="a.jpg,b.jpg,c.jpg"  ← frame-by-frame fallback.
+
+   Video wins on size: a few seconds of motion is far lighter than the same
+   motion as separate image frames (and MUCH lighter than a GIF). The video
+   element is created on first hover, so nothing downloads until needed. */
 function startSlideshow(card){
   const $img = $(card).find('.card__img, .hcard__img').first();
+
+  // --- video path ---
+  const src = imgAttr($img, 'data-video');
+  if(src){
+    let vid = card._video;
+    if(!vid){
+      vid = document.createElement('video');
+      vid.className = 'card__video';
+      vid.muted = true; vid.loop = true; vid.playsInline = true;
+      vid.setAttribute('muted',''); vid.setAttribute('playsinline','');
+      vid.preload = 'auto';
+      vid.src = src;
+      vid.addEventListener('loadeddata', function(){ vid.classList.add('is-ready'); });
+      $img.parent().append(vid);
+      card._video = vid;
+    }
+    vid.classList.add('is-on');
+    const play = vid.play();
+    if(play && play.catch) play.catch(function(){});   // autoplay policies
+    return;
+  }
+
+  // --- frame path ---
   const count = Number($(card).data('frames')) || 6;
   const frames = framesFor($img, count);
   if(frames.length < 2) return;
@@ -111,6 +143,10 @@ function startSlideshow(card){
   }, 130);
 }
 function stopSlideshow(card){
+  if(card._video){
+    card._video.classList.remove('is-on');
+    card._video.pause();
+  }
   if(card._slideTimer){ clearInterval(card._slideTimer); card._slideTimer = null; }
   const $img = $(card).find('.card__img, .hcard__img').first();
   $img.attr('src', imageFor($img));
@@ -438,28 +474,68 @@ function initShuffle(){
      · a hard timeout reveals the page regardless
      · window 'load' reveals it too
      · and styles.css fades it out on its own even if this script never runs */
-function preloadImages(urls, onDone){
+function preloadImages(urls, onDone, concurrency){
   const list = Array.from(new Set(urls)).filter(Boolean);
-  if(!list.length){ if(onDone) onDone(0, 0); return; }
-  let done = 0;
-  list.forEach(function(url){
-    const img = new Image();
-    img.onload = img.onerror = function(){
-      done++;
-      if(onDone) onDone(done, list.length);
-    };
-    img.src = url;
-  });
+  const total = list.length;
+  if(!total){ if(onDone) onDone(0, 0); return; }
+
+  /* Fetch a few at a time instead of all at once. Firing 150 requests
+     simultaneously makes every one of them slower — the images you can
+     actually see end up queued behind ones you can't. */
+  const MAX = concurrency || 6;
+  let next = 0, done = 0;
+
+  function pump(){
+    while(next < total && pump.active < MAX){
+      pump.active++;
+      const img = new Image();
+      img.onload = img.onerror = function(){
+        pump.active--; done++;
+        if(onDone) onDone(done, total);
+        pump();
+      };
+      img.src = list[next++];
+    }
+  }
+  pump.active = 0;
+  pump();
 }
 
-/* every hover-slideshow frame on the page (not needed for first paint) */
-function slideshowFrames(){
-  const out = [];
-  $('img').each(function(){
-    (imgAttr($(this), 'data-imgs') || '').split(',').map(function(s){ return s.trim(); })
-      .filter(Boolean).forEach(function(u){ out.push(u); });
-  });
-  return out;
+/* Warm one card's hover frames — called when the card scrolls into view, so
+   we only download frames for cards you're actually near. */
+function warmCard(card){
+  if(card._warmed) return;
+  card._warmed = true;
+  const $img = $(card).find('.card__img, .hcard__img').first();
+  // a hover video only needs its first bytes ready, not the whole file
+  const vsrc = imgAttr($img, 'data-video');
+  if(vsrc){
+    const v = document.createElement('video');
+    v.preload = 'metadata'; v.muted = true; v.src = vsrc;
+    return;
+  }
+  const frames = (imgAttr($img, 'data-imgs') || '').split(',')
+    .map(function(s){ return s.trim(); }).filter(Boolean);
+  if(frames.length) preloadImages(frames, null, 3);
+}
+
+/* Watch cards and warm them just before they're needed. */
+function initLazyWarm(){
+  const cards = document.querySelectorAll('.card, .hcard');
+  if(!cards.length) return;
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(warmCard); return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      warmCard(e.target);
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: '600px 0px' });        // start a bit before it's on screen
+  cards.forEach(function(c){ io.observe(c); });
+  // whatever you hover, warm it immediately regardless
+  $(document).on('mouseenter', '.card, .hcard', function(){ warmCard(this); });
 }
 
 function hidePreloader(){
@@ -479,8 +555,8 @@ function initPreloader(done){
     finished = true;
     hidePreloader();
     try { done(); } catch(e){ console.error(e); }
-    // now warm the hover frames in the background — nothing waits on this
-    preloadImages(slideshowFrames());
+    // hover frames are no longer fetched all at once — initLazyWarm() pulls
+    // them in per-card as you scroll, so bandwidth goes to what's on screen
   }
 
   // the images already on screen
@@ -517,6 +593,7 @@ $(function(){
   safely('clock',     initClock);
   safely('shuffle',   initShuffle);
   safely('images',    paintPlaceholders);   // resolves data-img -> src
+  safely('lazywarm',  initLazyWarm);
 
   initPreloader(function(){
     safely('reveal',  function(){ reveal('.card'); });
