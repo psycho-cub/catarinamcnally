@@ -93,7 +93,10 @@ body.is-collapsed .main{margin-left:0}
 /* ============ MAIN + NAV ============ */
 .main{margin-left:var(--sidebar-w);min-height:100vh;transition:margin-left .45s var(--ease)}
 .nav{position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;
-  gap:20px;padding:10px var(--gutter)}
+  gap:20px;padding:10px var(--gutter);background:transparent;
+  /* difference blend keeps labels readable over anything scrolling beneath.
+     White content inverts against the background: black on light, white on dark. */
+  mix-blend-mode:difference}
 .nav a:not(.nav__name){color:#fff;opacity:.6;transition:opacity .15s var(--ease)}
 .nav a:hover,.nav a.is-active{opacity:1}
 
@@ -107,9 +110,7 @@ body.is-collapsed .main{margin-left:0}
 body:not(.is-collapsed) .nav__name{
   opacity:0;pointer-events:none;transform:translate(-50%,-50%) translateY(-3px);transition-delay:0s}
 .nav__left{display:flex;align-items:center;gap:16px}
-.nav__links{display:flex; gap:16px}
-.nav__links li { padding:3px 2px;
-               background-color: var(--sidebar-bg) }
+.nav__links{display:flex;gap:16px}
 
 /* menu button — only exists while the sidebar is away.
    When the panel opens, this collapses out and the CLOSE button inside takes over. */
