@@ -108,7 +108,7 @@ body.is-collapsed .main{margin-left:0}
   padding:6px 10px;transition:background .15s var(--ease),color .15s var(--ease)}
 .nav a:not(.nav__name){display:inline-flex;align-items:center;padding:6px 10px;opacity:1}
 .nav a:not(.nav__name):hover{background:var(--line)}
-.nav a:not(.nav__name).is-active{background:var(--text);color:var(--bg)}
+.nav a:not(.nav__name).is-active{background:var(--line)}
 
 /* centred name — sans, and it swaps out with the sidebar:
    visible only while the panel is closed */
