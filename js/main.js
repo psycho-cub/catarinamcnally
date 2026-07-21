@@ -1,81 +1,18 @@
 /* ==========================================================
-   main.js — all site data + behaviour. Plain jQuery.
-   Edit your projects & tools in the DATA block below.
+   main.js — behaviour only.
+
+   All page CONTENT (cards, images, project text, media) lives
+   in the .html files. This file just makes things work:
+   placeholders, hover effects, theme, sidebar, password gate,
+   the project navigator and the home shuffle.
+
+   Images: any <img data-ph="…"> shows a grey placeholder until
+   you give it a real file. In the HTML add either
+       data-img="images/photo.jpg"                 (single)
+       data-imgs="images/a.jpg,images/b.jpg"       (hover slideshow)
+   or just replace the tag with a normal <img src="…">.
    ========================================================== */
 
-/* ===================== DATA ===================== */
-/* ============================================================
-   SITE DATA — the single source of truth for projects & tools.
-   Edit here; the build script regenerates the pages from it.
-
-   IMAGES (all optional — grey placeholder shows if omitted):
-     image  : 'images/foo.jpg'                    // card, hero, dot, next-thumb
-     images : ['images/a.jpg','images/b.jpg', …]  // hover slideshow frames
-     media  : ['images/m.jpg','images/c.mp4', …]  // project-page grid
-              // .mp4/.webm/.mov autoplay muted+loop; full-width shows at the
-              // media's natural height, paired items are 600px tall.
-
-   TAGS: add  tag:'New'  or  tag:'Coming Soon'  to any project.
-     "Coming Soon" also makes the project non-navigable (no page, hidden
-     from the bottom nav). "New" is cosmetic only.
-   ============================================================ */
-
-
-const SECTIONS = [
-  { label:'Freelance work', items:[
-    {slug:'fl-01',client:'Client One',  title:'Placeholder Project',year:'2026',scope:'Design & Build',type:'Freelance',tag:'New'},
-    {slug:'fl-02',client:'Client Two',  title:'Placeholder Project',year:'2025',scope:'Art Direction', type:'Freelance'},
-    {slug:'fl-03',client:'Client Three',title:'Placeholder Project',year:'2025',scope:'Design & Build',type:'Freelance'},
-    {slug:'fl-04',client:'Client Four', title:'Placeholder Project',year:'2025',scope:'Motion',        type:'Freelance',tag:'Coming Soon'},
-    {slug:'fl-05',client:'Client Five', title:'Placeholder Project',year:'2024',scope:'Design & Build',type:'Freelance'},
-    {slug:'fl-06',client:'Client Six',  title:'Placeholder Project',year:'2024',scope:'Identity',      type:'Freelance'},
-    {slug:'fl-07',client:'Client Seven',title:'Placeholder Project',year:'2024',scope:'Design & Build',type:'Freelance'},
-    {slug:'fl-08',client:'Client Eight',title:'Placeholder Project',year:'2023',scope:'Design',        type:'Freelance'}
-  ]},
-  { label:'In-house', locked:true, password:'catarina', items:[
-    {slug:'ih-01',client:'Company Name',title:'Placeholder Project',year:'2025',scope:'Product Design',type:'In-house',tag:'New'},
-    {slug:'ih-02',client:'Company Name',title:'Placeholder Project',year:'2025',scope:'Design System', type:'In-house'},
-    {slug:'ih-03',client:'Company Name',title:'Placeholder Project',year:'2024',scope:'Campaign',      type:'In-house'},
-    {slug:'ih-04',client:'Company Name',title:'Placeholder Project',year:'2024',scope:'Web',           type:'In-house'}
-  ]},
-  { label:'Pet projects', items:[
-    {slug:'pp-01',client:'Self-initiated',title:'Placeholder Project',year:'2026',scope:'Everything',type:'Pet project',tag:'Coming Soon'},
-    {slug:'pp-02',client:'Self-initiated',title:'Placeholder Project',year:'2025',scope:'Everything',type:'Pet project'},
-    {slug:'pp-03',client:'Self-initiated',title:'Placeholder Project',year:'2025',scope:'Everything',type:'Pet project'},
-    {slug:'pp-04',client:'Self-initiated',title:'Placeholder Project',year:'2024',scope:'Everything',type:'Pet project'}
-  ]}
-];
-
-const TOOLS = [
-  { label:'Design tools', items:[
-    {slug:'dt-01',client:'Tool One',  title:'Placeholder tool', url:'#'},
-    {slug:'dt-02',client:'Tool Two',  title:'Placeholder tool', url:'#'},
-    {slug:'dt-03',client:'Tool Three',title:'Placeholder tool', url:'#'},
-    {slug:'dt-04',client:'Tool Four', title:'Placeholder tool', url:'#'}
-  ]},
-  { label:'Resources', items:[
-    {slug:'rs-01',client:'Resource One',  title:'Placeholder resource', url:'#'},
-    {slug:'rs-02',client:'Resource Two',  title:'Placeholder resource', url:'#'},
-    {slug:'rs-03',client:'Resource Three',title:'Placeholder resource', url:'#'},
-    {slug:'rs-04',client:'Resource Four', title:'Placeholder resource', url:'#'}
-  ]}
-];
-
-/* Media layout for each project page (reorder/swap freely) */
-const PROJECT_MEDIA = [
-  'media--full',
-  'media--half','media--half',
-  'media--unit','media--unit','media--unit','media--unit',
-  'media--tall','media--half',
-  'media--full'
-];
-
-/* Optional per-project copy: keyed by slug. Falls back to placeholder text. */
-const COPY = {
-  // 'fl-01': { lede1:'…', lede2:'…' },
-};
-
-/* ===================== CORE ===================== */
 let theme = 'light';
 
 /* ---------- images ---------- */
@@ -263,313 +200,222 @@ function initClock(){
   })();
 }
 
-/* ===================== PAGES ==================== */
+/* ===================== PAGE BEHAVIOUR ===================== */
+
+/* Order of the project pages — used by the bottom navigator only.
+   Add/remove a line when you add/remove a project page. */
+const PROJECT_ORDER = [
+  {slug:'fl-01', name:'Client One — Placeholder Project'},
+  {slug:'fl-02', name:'Client Two — Placeholder Project'},
+  {slug:'fl-03', name:'Client Three — Placeholder Project'},
+  {slug:'fl-05', name:'Client Five — Placeholder Project'},
+  {slug:'fl-06', name:'Client Six — Placeholder Project'},
+  {slug:'fl-07', name:'Client Seven — Placeholder Project'},
+  {slug:'fl-08', name:'Client Eight — Placeholder Project'},
+  {slug:'ih-01', name:'Company Name — Placeholder Project'},
+  {slug:'ih-02', name:'Company Name — Placeholder Project'},
+  {slug:'ih-03', name:'Company Name — Placeholder Project'},
+  {slug:'ih-04', name:'Company Name — Placeholder Project'},
+  {slug:'pp-02', name:'Self-initiated — Placeholder Project'},
+  {slug:'pp-03', name:'Self-initiated — Placeholder Project'},
+  {slug:'pp-04', name:'Self-initiated — Placeholder Project'}
+];
+
 let syncAccordionRef = null;
-/* ============================================================
-   app.js — page-aware runtime for the multi-page site.
-   Detects the current page via <body data-page> and builds it.
-   Password unlock is persisted in sessionStorage so it survives
-   navigation between the separate .html files.
-   ============================================================ */
 
-  // tag each project with its section + locked flag
-  SECTIONS.forEach(s => s.items.forEach(it => { it._section = s.label; it._locked = !!s.locked; }));
-  const ALL = SECTIONS.flatMap(s => s.items);
-
-  // unlock state persisted across pages
-  const unlocked = {};
-  try {
-    JSON.parse(sessionStorage.getItem('unlocked') || '[]').forEach(l => unlocked[l] = true);
-  } catch(e){}
-  const saveUnlocked = () => {
-    try { sessionStorage.setItem('unlocked', JSON.stringify(Object.keys(unlocked))); } catch(e){}
-  };
-  const sectionOf  = label => SECTIONS.find(s => s.label === label);
-  const isUnlocked = it => !it._locked || unlocked[it._section];
-  const isLive     = p => p.tag !== 'Coming Soon' && isUnlocked(p);
-  let LIVE = ALL.filter(isLive);
-  const refreshLive = () => { LIVE = ALL.filter(isLive); };
-
-  const LOCK_SVG = '<svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6.2" width="9" height="6.3" rx="1.2"/><path d="M4.4 6.2V4.6a2.6 2.6 0 0 1 5.2 0v1.6"/></svg>';
-
-  /* ---------- grid builder (work + tools) ---------- */
-  function buildGrid($target, sections, opts){
-    opts = opts || {};
-    const clickable = opts.clickable, external = opts.external;
-    sections.forEach(function(section){
-      const locked = section.locked && !unlocked[section.label];
-      $target.append(
-        '<header class="section__head'+(locked ? ' is-locked' : '')+'" data-section="'+section.label+'">'+
-          '<h2 class="section__label">'+section.label+
-            (section.locked ? '<span class="section__lock" aria-label="'+(locked?'Locked':'Unlocked')+'">'+LOCK_SVG+'</span>' : '')+
-          '</h2>'+
-          '<span class="section__right">'+
-            '<span class="section__count">'+String(section.items.length).padStart(2,'0')+'</span>'+
-            '<span class="section__chev" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 4.5 6 8.5l4-4"/></svg></span>'+
-          '</span>'+
-        '</header>');
-      const $grid = $('<div class="grid"></div>');
-      section.items.forEach(function(item, i){
-        const tag = item.tag ? '<span class="card__tag card__tag--'+item.tag.toLowerCase().replace(/\s+/g,'-')+'">'+item.tag+'</span>' : '';
-        const gated = clickable && item._locked && !unlocked[item._section];
-        const live  = clickable && isLive(item);
-        const frames = 5 + (i % 6);
-        const arrow = external ? '<span class="card__ext" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3.5 8.5 8.5 3.5M4.2 3.5h4.3v4.3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' : '';
-        const href = external ? (item.url || '#') : (live ? (item.slug + '.html') : '#');
-        const dimg  = item.image ? ' data-img="'+item.image+'"' : '';
-        const dimgs = item.images ? ' data-imgs="'+item.images.join(',')+'"' : '';
-        $grid.append(
-          '<a class="card'+(live ? '' : ' card--static')+
-               (external ? ' card--ext-link' : '')+
-               (item.tag === 'Coming Soon' ? ' card--soon' : '')+
-               (gated ? ' card--locked' : '')+'" '+
-             'href="'+href+'"'+
-             (external ? ' target="_blank" rel="noopener noreferrer"' : '')+
-             (gated ? ' data-lock="'+item._section+'"' : '')+
-             ' data-frames="'+frames+'" data-i="'+i+'">'+
-            '<div class="card__frame">'+
-              '<img class="card__img" data-ph="4:3" data-ph-label="'+item.client+'"'+dimg+dimgs+' alt="">'+
-              (gated ? '<span class="card__lockveil">'+LOCK_SVG+'</span>' : '')+
-              tag+
-            '</div>'+
-            '<div class="card__meta">'+
-              '<span class="card__client" data-final="'+item.client+'">'+item.client+'</span>'+
-              '<span class="card__title" data-final="'+item.title+'">'+item.title+'</span>'+
-              arrow+
-            '</div>'+
-          '</a>');
-      });
-      $target.append($grid);
+/* ---------- password gate ---------- */
+/* Sections are marked in the HTML with  class="section__head is-locked"
+   and  data-password="…". Unlocking is remembered for the browser session. */
+let pendingSection = null;
+function unlockedSections(){
+  try { return JSON.parse(sessionStorage.getItem('unlocked') || '[]'); } catch(e){ return []; }
+}
+function applyUnlocked(){
+  unlockedSections().forEach(function(label){
+    $('.section__head[data-section="'+label+'"]').removeClass('is-locked')
+      .find('.section__lock').attr('aria-label','Unlocked');
+    $('.card--locked[data-lock="'+label+'"]').each(function(){
+      $(this).removeClass('card--locked').attr('href', $(this).data('href'));
+      $(this).find('.card__lockveil').remove();
     });
-  }
-
-  /* ---------- password modal ---------- */
-  let pendingSection = null;
-  function tryUnlock(label){
-    const section = sectionOf(label);
-    if(!section || unlocked[label]) return;
-    pendingSection = label;
-    $('#lock-modal-text').text('“'+label+'” is password-protected. Enter the password to view these projects.');
-    $('#lock-modal-input').val('').removeClass('is-wrong');
-    $('#lock-modal-error').addClass('hidden');
-    $('#lock-modal').removeClass('hidden');
-    setTimeout(() => $('#lock-modal-input').trigger('focus'), 30);
-  };
-  function closeLockModal(){ $('#lock-modal').addClass('hidden'); pendingSection = null; };
-  function submitUnlock(){
-    const section = sectionOf(pendingSection);
-    if(!section) return closeLockModal();
-    const entry = $('#lock-modal-input').val();
-    if(entry === section.password){
-      SECTIONS.forEach(s => { if(s.locked && s.password === entry) unlocked[s.label] = true; });
-      saveUnlocked();
-      refreshLive();
-      // rebuild whichever grid is on this page
-      if($('#work').length){ $('#work').empty(); buildGrid($('#work'), SECTIONS, {clickable:true}); paintPlaceholders(); replayReveal('#work'); if(syncAccordionRef) syncAccordionRef(); }
-      closeLockModal();
-    } else {
-      $('#lock-modal-input').addClass('is-wrong').trigger('select');
-      $('#lock-modal-error').removeClass('hidden');
-    }
-  }
-  function wireModal(){
-    $('#lock-modal-submit').on('click', submitUnlock);
-    $('#lock-modal-cancel, #lock-modal-close, #lock-modal-backdrop').on('click', closeLockModal);
-    $('#lock-modal-input').on('keydown', function(e){ if(e.key === 'Enter') submitUnlock(); else $(this).removeClass('is-wrong'); })
-                          .on('input', function(){ $('#lock-modal-error').addClass('hidden'); });
-    $(document).on('click', '.card--locked', function(e){ e.preventDefault(); tryUnlock($(this).data('lock')); });
-    $(document).on('click', '.section__head.is-locked .section__lock', function(e){ e.stopPropagation(); tryUnlock($(this).closest('.section__head').data('section')); });
-    // a locked card that becomes live after unlock should navigate on next click (handled by href)
-  }
-
-  /* ---------- mobile accordion (work + tools grids) ---------- */
-  function initAccordion(){
-    const isNarrow = () => window.matchMedia('(max-width:860px)').matches;
-    function sync(){
-      if(isNarrow()) $('.grid').addClass('is-collapsible');
-      else { $('.grid').removeClass('is-collapsible is-shut').css('max-height',''); $('.section__head').removeClass('is-shut'); }
-    }
-    syncAccordionRef = sync;
-    $(document).on('click', '.section__head', function(){
-      if(!isNarrow()) return;
-      const $head = $(this), $grid = $head.next('.grid');
-      const shut = $head.toggleClass('is-shut').hasClass('is-shut');
-      if(shut){ $grid.css('max-height', $grid[0].scrollHeight+'px'); $grid[0].offsetHeight; $grid.addClass('is-shut'); }
-      else { $grid.removeClass('is-shut').css('max-height', $grid[0].scrollHeight+'px'); $grid.one('transitionend', () => $grid.css('max-height','')); }
-    });
-    sync();
-    let rt; $(window).on('resize', () => { clearTimeout(rt); rt = setTimeout(sync, 150); });
-  }
-
-  /* ---------- card hover (scramble + slideshow) ---------- */
-  function initCardHover(){
-    $(document).on('mouseenter', '.card', function(){
-      if($(this).hasClass('card--soon') || $(this).hasClass('card--locked')) return;
-      const $c = $(this).find('.card__client'), $t = $(this).find('.card__title');
-      if($c.length) scrambleText($c[0], $c.data('final') || $c.text());
-      if($t.length) scrambleText($t[0], $t.data('final') || $t.text());
-      startSlideshow(this);
-    }).on('mouseleave', '.card', function(){
-      stopSlideshow(this);
-      const $c = $(this).find('.card__client'), $t = $(this).find('.card__title');
-      if($c.length){ if($c[0]._scrambleRAF) cancelAnimationFrame($c[0]._scrambleRAF); $c.text($c.data('final') || $c.text()); }
-      if($t.length){ if($t[0]._scrambleRAF) cancelAnimationFrame($t[0]._scrambleRAF); $t.text($t.data('final') || $t.text()); }
-    });
-    // home cards
-    $(document).on('mouseenter', '.hcard', function(){
-      startSlideshow(this);
-      $(this).find('.scram').each(function(){ scrambleText(this, $(this).data('final') || this.textContent); });
-    }).on('mouseleave', '.hcard', function(){
-      stopSlideshow(this);
-      $(this).find('.scram').each(function(){ if(this._scrambleRAF) cancelAnimationFrame(this._scrambleRAF); if(this._origHTML != null) this.innerHTML = this._origHTML; else this.textContent = $(this).data('final') || this.textContent; });
-    });
-  }
-  function replayReveal(sel){
-    document.querySelectorAll(sel + ' .card').forEach(el => el.classList.remove('is-in'));
-    void (document.querySelector(sel) || {}).offsetHeight;
-    requestAnimationFrame(() => reveal(sel + ' .card'));
-  };
-
-  /* ---------- project page ---------- */
-  function buildProjectPage(slug){
-    const idx  = Math.max(0, LIVE.findIndex(p => p.slug === slug));
-    const p    = LIVE[idx];
-    if(!p) return;
-    const prev = LIVE[(idx - 1 + LIVE.length) % LIVE.length];
-    const next = LIVE[(idx + 1) % LIVE.length];
-    const copy = COPY[p.slug] || {};
-
-    document.title = p.client + ' — ' + p.title;
-
-    // fields with scramble + height-locked so layout doesn't jump
-    const fields = [
-      { el:'#p-title', text:p.title },
-      { el:'#p-year',  text:p.year  },
-      { el:'#p-type',  text:p.type  },
-      { el:'#p-scope', text:p.scope }
-    ];
-    if(copy.lede1) $('#p-copy-1').text(copy.lede1).data('final', copy.lede1);
-    if(copy.lede2) $('#p-copy-2').text(copy.lede2).data('final', copy.lede2);
-    ['#p-copy-1','#p-copy-2'].forEach(sel => {
-      const t = $(sel).data('final') || $(sel)[0].textContent.replace(/\s+/g,' ').trim();
-      $(sel).data('final', t); fields.push({ el:sel, text:t, fast:true });
-    });
-    $('#next-title').text(next.title).attr('data-final', next.title);
-    $('#next-title')[0]._origHTML = null;
-    $('#next-link').attr('href', next.slug + '.html');
-    $('#next-img').attr('data-ph-label', next.client);
-    if(next.image) $('#next-img').attr('data-img', next.image); else $('#next-img').removeAttr('data-img');
-
-    // media grid
-    const media = p.media || [];
-    const $media = $('#media').empty();
-    PROJECT_MEDIA.forEach(function(cls, i){
-      const ratio = cls === 'media--full' ? '16:7' : cls === 'media--tall' ? '3:4' : cls === 'media--unit' ? '1:1' : '4:3';
-      const src = media[i];
-      let inner;
-      if(src && /\.(mp4|webm|mov)$/i.test(src)) inner = '<video src="'+src+'" autoplay muted loop playsinline></video>';
-      else if(src) inner = '<img data-ph="'+ratio+'" data-ph-label="'+String(i+1).padStart(2,'0')+'" data-img="'+src+'" alt="">';
-      else inner = '<img data-ph="'+ratio+'" data-ph-label="'+String(i+1).padStart(2,'0')+'" alt="">';
-      $media.append('<figure class="'+cls+' media" data-i="'+i+'">'+inner+'</figure>');
-    });
-
-    // bottom navigator
-    $('#prev-project').attr('href', prev.slug + '.html');
-    $('#next-project').attr('href', next.slug + '.html');
-    const $dots = $('#projbar-dots').empty();
-    LIVE.forEach(function(item){
-      const thumb = item.image ? ' data-img="'+item.image+'"' : '';
-      $dots.append(
-        '<a class="dot'+(item.slug === p.slug ? ' is-current' : '')+'" href="'+item.slug+'.html" aria-label="'+item.client+' — '+item.title+'">'+
-          '<span class="dot__card"><span class="dot__thumb"><img data-ph="4:3" data-ph-label="'+item.client+'"'+thumb+' alt=""></span>'+
-          '<span class="dot__name">'+item.client+' — '+item.title+'</span></span><i></i></a>');
-    });
-    $('#projbar').removeClass('hidden');
-
-    paintPlaceholders();
-
-    // intro scramble
-    fields.forEach(f => {
-      const el = $(f.el)[0];
-      el.style.minHeight = ''; el.textContent = f.text; el.style.minHeight = el.offsetHeight + 'px';
-      $(f.el).css('opacity', 0);
-    });
-    $('.project__head').removeClass('is-in');
-    requestAnimationFrame(() => $('.project__head').addClass('is-in'));
-    setTimeout(function(){
-      fields.forEach(f => {
-        $(f.el).css('opacity', 1);
-        const opts = f.fast ? { speed:1, settle: Math.min(0.6, 34 / f.text.length) } : {};
-        scrambleText($(f.el)[0], f.text, opts);
-      });
-    }, 120);
-
-    // next-project hover
-    $(document).on('mouseenter', '#next-link', function(){
-      $(this).find('.scram').each(function(){ scrambleText(this, $(this).data('final') || this.textContent); });
-    }).on('mouseleave', '#next-link', function(){
-      $(this).find('.scram').each(function(){ if(this._scrambleRAF) cancelAnimationFrame(this._scrambleRAF); this.textContent = $(this).data('final') || this.textContent; });
-    });
-
-    // keyboard arrows
-    $(document).on('keydown', function(e){
-      if(!$('#lock-modal').hasClass('hidden')) return;
-      if(e.key === 'ArrowLeft')  location.href = prev.slug + '.html';
-      if(e.key === 'ArrowRight') location.href = next.slug + '.html';
-    });
-  }
-
-  /* ---------- home shuffle (FLIP) ---------- */
-  function initShuffle(){
-    const banner = document.getElementById('home-banner');
-    if(!banner) return;
-    let layoutIndex = 0;
-    banner.classList.add('lay-0');
-    $('#home-shuffle').on('click', function(){
-      const items = Array.from(banner.querySelectorAll('.bi'));
-      const first = items.map(el => el.getBoundingClientRect());
-      let next = layoutIndex; while(next === layoutIndex) next = Math.floor(Math.random()*10);
-      banner.classList.remove('lay-'+layoutIndex); banner.classList.add('lay-'+next); layoutIndex = next;
-      items.forEach((el, i) => {
-        const last = el.getBoundingClientRect();
-        el.style.transform = 'translate('+(first[i].left-last.left)+'px,'+(first[i].top-last.top)+'px)';
-        el.style.transition = 'none';
-      });
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        items.forEach(el => { el.style.transition = 'transform .55s cubic-bezier(.22,.61,.36,1)'; el.style.transform = ''; });
-      }));
-      setTimeout(() => items.forEach(el => { el.style.transition = ''; }), 640);
-    });
-  }
-
-  /* ============ PAGE BOOT ============ */
-  $(function(){
-    initTheme();
-    initHeader();
-    wireModal();
-    initCardHover();
-    initClock();
-
-    const page = document.body.getAttribute('data-page');
-
-    if(page === 'home'){
-      paintPlaceholders();
-      initShuffle();
-    }
-    if(page === 'work'){
-      buildGrid($('#work'), SECTIONS, {clickable:true});
-      paintPlaceholders();
-      reveal('.card');
-      initAccordion();
-    }
-    if(page === 'tools'){
-      buildGrid($('#tools'), TOOLS, {clickable:false, external:true});
-      paintPlaceholders();
-      reveal('.card');
-      initAccordion();
-    }
-    if(page === 'project'){
-      const slug = document.body.getAttribute('data-slug');
-      buildProjectPage(slug);
-    }
   });
+}
+function tryUnlock(label){
+  pendingSection = label;
+  $('#lock-modal-text').text('“'+label+'” is password-protected. Enter the password to view these projects.');
+  $('#lock-modal-input').val('').removeClass('is-wrong');
+  $('#lock-modal-error').addClass('hidden');
+  $('#lock-modal').removeClass('hidden');
+  setTimeout(function(){ $('#lock-modal-input').trigger('focus'); }, 30);
+}
+function closeLockModal(){ $('#lock-modal').addClass('hidden'); pendingSection = null; }
+function submitUnlock(){
+  const $head = $('.section__head[data-section="'+pendingSection+'"]');
+  const pw = $head.data('password');
+  if($('#lock-modal-input').val() === String(pw)){
+    const list = unlockedSections();
+    if(list.indexOf(pendingSection) === -1) list.push(pendingSection);
+    try { sessionStorage.setItem('unlocked', JSON.stringify(list)); } catch(e){}
+    applyUnlocked();
+    closeLockModal();
+  } else {
+    $('#lock-modal-input').addClass('is-wrong').trigger('select');
+    $('#lock-modal-error').removeClass('hidden');
+  }
+}
+function initLock(){
+  $('#lock-modal-submit').on('click', submitUnlock);
+  $('#lock-modal-cancel, #lock-modal-close, #lock-modal-backdrop').on('click', closeLockModal);
+  $('#lock-modal-input').on('keydown', function(e){ if(e.key === 'Enter') submitUnlock(); else $(this).removeClass('is-wrong'); })
+                        .on('input', function(){ $('#lock-modal-error').addClass('hidden'); });
+  $(document).on('click', '.card--locked', function(e){ e.preventDefault(); tryUnlock($(this).data('lock')); });
+  $(document).on('click', '.section__head.is-locked .section__lock', function(e){
+    e.stopPropagation(); tryUnlock($(this).closest('.section__head').data('section'));
+  });
+  applyUnlocked();
+}
+
+/* ---------- mobile accordion ---------- */
+function initAccordion(){
+  if(!$('.grid').length) return;
+  const isNarrow = () => window.matchMedia('(max-width:860px)').matches;
+  function sync(){
+    if(isNarrow()) $('.grid').addClass('is-collapsible');
+    else { $('.grid').removeClass('is-collapsible is-shut').css('max-height',''); $('.section__head').removeClass('is-shut'); }
+  }
+  syncAccordionRef = sync;
+  $(document).on('click', '.section__head', function(){
+    if(!isNarrow()) return;
+    const $head = $(this), $grid = $head.next('.grid');
+    const shut = $head.toggleClass('is-shut').hasClass('is-shut');
+    if(shut){ $grid.css('max-height', $grid[0].scrollHeight+'px'); $grid[0].offsetHeight; $grid.addClass('is-shut'); }
+    else { $grid.removeClass('is-shut').css('max-height', $grid[0].scrollHeight+'px');
+           $grid.one('transitionend', function(){ $grid.css('max-height',''); }); }
+  });
+  sync();
+  let rt; $(window).on('resize', function(){ clearTimeout(rt); rt = setTimeout(sync, 150); });
+}
+
+/* ---------- card hover ---------- */
+function initCardHover(){
+  $(document).on('mouseenter', '.card', function(){
+    if($(this).hasClass('card--soon') || $(this).hasClass('card--locked')) return;
+    const $c = $(this).find('.card__client'), $t = $(this).find('.card__title');
+    if($c.length) scrambleText($c[0], $c.data('final') || $c.text());
+    if($t.length) scrambleText($t[0], $t.data('final') || $t.text());
+    startSlideshow(this);
+  }).on('mouseleave', '.card', function(){
+    stopSlideshow(this);
+    const $c = $(this).find('.card__client'), $t = $(this).find('.card__title');
+    if($c.length){ if($c[0]._scrambleRAF) cancelAnimationFrame($c[0]._scrambleRAF); $c.text($c.data('final') || $c.text()); }
+    if($t.length){ if($t[0]._scrambleRAF) cancelAnimationFrame($t[0]._scrambleRAF); $t.text($t.data('final') || $t.text()); }
+  });
+  $(document).on('mouseenter', '.hcard', function(){
+    startSlideshow(this);
+    $(this).find('.scram').each(function(){ scrambleText(this, $(this).data('final') || this.textContent); });
+  }).on('mouseleave', '.hcard', function(){
+    stopSlideshow(this);
+    $(this).find('.scram').each(function(){
+      if(this._scrambleRAF) cancelAnimationFrame(this._scrambleRAF);
+      if(this._origHTML != null) this.innerHTML = this._origHTML;
+      else this.textContent = $(this).data('final') || this.textContent;
+    });
+  });
+  $(document).on('mouseenter', '#next-link', function(){
+    $(this).find('.scram').each(function(){ scrambleText(this, $(this).data('final') || this.textContent); });
+  }).on('mouseleave', '#next-link', function(){
+    $(this).find('.scram').each(function(){
+      if(this._scrambleRAF) cancelAnimationFrame(this._scrambleRAF);
+      this.textContent = $(this).data('final') || this.textContent;
+    });
+  });
+}
+
+/* ---------- project page: intro scramble + bottom navigator ---------- */
+function initProjectPage(){
+  const slug = document.body.getAttribute('data-slug');
+  if(!slug) return;
+
+  /* scramble the info that's already in the HTML, with the height locked
+     first so nothing below it jumps while the letters settle */
+  const sels = ['#p-title','#p-year','#p-type','#p-scope','#p-copy-1','#p-copy-2'];
+  const fields = sels.map(function(sel){
+    const el = $(sel)[0];
+    if(!el) return null;
+    const text = el.textContent.replace(/\s+/g,' ').trim();
+    el.style.minHeight = ''; el.textContent = text;
+    el.style.minHeight = el.offsetHeight + 'px';
+    $(sel).css('opacity', 0);
+    return { el:el, text:text, fast: sel.indexOf('copy') > -1 };
+  }).filter(Boolean);
+  $('.project__head').removeClass('is-in');
+  requestAnimationFrame(function(){ $('.project__head').addClass('is-in'); });
+  setTimeout(function(){
+    fields.forEach(function(f){
+      $(f.el).css('opacity', 1);
+      scrambleText(f.el, f.text, f.fast ? { speed:1, settle: Math.min(0.6, 34 / f.text.length) } : {});
+    });
+  }, 120);
+
+  /* bottom navigator */
+  const idx  = Math.max(0, PROJECT_ORDER.findIndex(function(p){ return p.slug === slug; }));
+  const prev = PROJECT_ORDER[(idx - 1 + PROJECT_ORDER.length) % PROJECT_ORDER.length];
+  const next = PROJECT_ORDER[(idx + 1) % PROJECT_ORDER.length];
+  $('#prev-project').attr('href', prev.slug + '.html');
+  $('#next-project').attr('href', next.slug + '.html');
+  const $dots = $('#projbar-dots').empty();
+  PROJECT_ORDER.forEach(function(p){
+    $dots.append(
+      '<a class="dot'+(p.slug === slug ? ' is-current' : '')+'" href="'+p.slug+'.html" aria-label="'+p.name+'">'+
+        '<span class="dot__card"><span class="dot__thumb"><img data-ph="4:3" data-ph-label="'+p.name+'" alt=""></span>'+
+        '<span class="dot__name">'+p.name+'</span></span><i></i></a>');
+  });
+  $('#projbar').removeClass('hidden');
+  paintPlaceholders();
+
+  $(document).on('keydown', function(e){
+    if(!$('#lock-modal').hasClass('hidden')) return;
+    if(e.key === 'ArrowLeft')  location.href = prev.slug + '.html';
+    if(e.key === 'ArrowRight') location.href = next.slug + '.html';
+  });
+}
+
+/* ---------- home: shuffle the footer layout (FLIP) ---------- */
+function initShuffle(){
+  const banner = document.getElementById('home-banner');
+  if(!banner) return;
+  let layoutIndex = 0;
+  banner.classList.add('lay-0');
+  $('#home-shuffle').on('click', function(){
+    const items = Array.from(banner.querySelectorAll('.bi'));
+    const first = items.map(function(el){ return el.getBoundingClientRect(); });
+    let next = layoutIndex;
+    while(next === layoutIndex) next = Math.floor(Math.random() * 10);
+    banner.classList.remove('lay-' + layoutIndex);
+    banner.classList.add('lay-' + next);
+    layoutIndex = next;
+    items.forEach(function(el, i){
+      const last = el.getBoundingClientRect();
+      el.style.transform = 'translate('+(first[i].left-last.left)+'px,'+(first[i].top-last.top)+'px)';
+      el.style.transition = 'none';
+    });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      items.forEach(function(el){ el.style.transition = 'transform .55s cubic-bezier(.22,.61,.36,1)'; el.style.transform = ''; });
+    }); });
+    setTimeout(function(){ items.forEach(function(el){ el.style.transition = ''; }); }, 640);
+  });
+}
+
+/* ===================== BOOT ===================== */
+$(function(){
+  initTheme();
+  initHeader();
+  initLock();
+  initCardHover();
+  initAccordion();
+  initClock();
+  initShuffle();
+  paintPlaceholders();
+  reveal('.card');
+  initProjectPage();
+});
