@@ -2,6 +2,15 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
+<script>
+/* Set the theme BEFORE the page paints, otherwise a dark-mode visitor sees a
+   white flash on every navigation while the stylesheet loads with the default. */
+(function(){try{
+  var t=localStorage.getItem('theme');
+  if(!t)t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+}catch(e){}})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tools &amp; Resources — Catarina McNally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -104,7 +113,7 @@
   <div class="nav__left">
     <button class="menu-btn" id="menu-btn" aria-expanded="true" aria-controls="sidebar">
       <span class="menu-btn__bars" aria-hidden="true"><i></i><i></i></span>
-      <span class="scram" data-final="Info">Info</span>
+      <span class="scram" data-final="About">About</span>
     </button>
     <ul class="nav__links">
       <li><a href="work.html" data-nav="work"><span class="scram" data-final="Selected Work" data-short="Work"><span class="lbl-long">Selected </span>Work</span></a></li>
@@ -120,7 +129,9 @@
 </nav>
   <!-- Tools & Resources -->
   <div class="work" id="tools">
-      <header class="section__head" data-section="Design tools">
+      
+      <section class="work__section">
+<header class="section__head" data-section="Design tools">
         <h2 class="section__label">Design tools</h2>
         <span class="section__right">
           <span class="section__count">04</span>
@@ -173,7 +184,10 @@
           </div>
         </a>
       </div>
-      <header class="section__head" data-section="Resources">
+      </section>
+
+      <section class="work__section">
+<header class="section__head" data-section="Resources">
         <h2 class="section__label">Resources</h2>
         <span class="section__right">
           <span class="section__count">04</span>
@@ -226,6 +240,8 @@
           </div>
         </a>
       </div>
+      </section>
+
   </div>
 </main>
 
