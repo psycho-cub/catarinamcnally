@@ -45,8 +45,14 @@ function imgAttr($img, name){
   return near.length ? near.attr(name) : null;
 }
 function imageFor($img){
+  // an explicit data-img wins
   const real = imgAttr($img, 'data-img');
-  return real ? real : placeholder($img.data('ph'), $img.data('ph-label'));
+  if(real) return real;
+  // otherwise respect a real src already written in the HTML — only a
+  // generated placeholder (a data: URI) or an empty src gets replaced
+  const cur = $img.attr('src');
+  if(cur && cur.indexOf('data:') !== 0) return cur;
+  return placeholder($img.data('ph'), $img.data('ph-label'));
 }
 function framesFor($img, count){
   const list = (imgAttr($img, 'data-imgs') || '').split(',').map(s => s.trim()).filter(Boolean);
