@@ -309,7 +309,7 @@ body:not(.is-collapsed) .menu-btn{
   stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .section__head.is-shut .section__chev{transform:rotate(-90deg)}
 
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);padding-top:var(--gap)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding-top:var(--gap)}
 /* collapsible on mobile — max-height is driven from JS so it can animate */
 .grid.is-collapsible{overflow:hidden;
   transition:max-height .4s var(--ease),opacity .3s var(--ease),padding-top .4s var(--ease)}
