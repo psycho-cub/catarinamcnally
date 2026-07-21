@@ -8,15 +8,20 @@
 /* Monochrome by design — no accent colour anywhere. Hierarchy is
    carried by weight, size and hairlines, exactly like the reference. */
 [data-theme="light"]{
+  color-scheme:light;
   --bg:#FFFFFF; --sidebar-bg:#F0F0F0; --surface:#F2F2F2; --text:#0B0B0B; --muted:#8C8C8C;
   --line:#E4E4E4; --line-soft:#EFEFEF; --accent:#0B0B0B;
 }
 [data-theme="dark"]{
+  color-scheme:dark;
   --bg:#0B0B0B; --sidebar-bg:#141414; --surface:#161616; --text:#F2F2F2; --muted:#787878;
   --line:#232323; --line-soft:#1A1A1A; --accent:#F2F2F2;
 }
 
 /* ============ BASE ============ */
+/* paint the root too, so the first frame of a page load is already the right
+   colour instead of flashing white before <body> renders */
+html{background:var(--bg)}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);
   font-size:13px;line-height:1.4;letter-spacing:-.005em;-webkit-font-smoothing:antialiased;
@@ -32,9 +37,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   font-size:12px;letter-spacing:0;text-transform:none}
 /* mono is reserved for structural labels: nav links, panel + section titles, numerals.
    The centred name is excluded — it uses the sidebar's sans treatment. */
-.nav a:not(.nav__name),.panel__title,.section__label,.section__count{
+.nav a:not(.nav__name),.menu-btn,.panel__title,.section__label,.section__count{
   font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase}
-.nav a:not(.nav__name),.panel__title,.section__label{font-size:11px}
+.nav a:not(.nav__name),.menu-btn,.panel__title,.section__label{font-size:11px}
 .section__count{font-size:10px}
 .dim{color:var(--muted)}
 .hidden{display:none !important}
@@ -93,46 +98,44 @@ body.is-collapsed .main{margin-left:0}
 /* ============ MAIN + NAV ============ */
 .main{margin-left:var(--sidebar-w);min-height:100vh;transition:margin-left .45s var(--ease)}
 .nav{position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;
-  gap:20px;padding:10px var(--gutter);background:transparent;
-  /* difference blend keeps labels readable over anything scrolling beneath.
-     White content inverts against the background: black on light, white on dark. */
-  mix-blend-mode:difference}
-.nav a:not(.nav__name){color:#fff;opacity:.6;transition:opacity .15s var(--ease)}
-.nav a:hover,.nav a.is-active{opacity:1}
+  gap:20px;padding:10px var(--gutter);background:transparent}
+
+/* Nav controls are pills with their own background, so they stay legible over
+   whatever scrolls beneath without needing a blend mode. */
+.nav a:not(.nav__name),
+.menu-btn,
+.theme-toggle{background:var(--sidebar-bg);color:var(--text);border:0;border-radius:2px;
+  padding:6px 10px;transition:background .15s var(--ease),color .15s var(--ease)}
+.nav a:not(.nav__name){display:inline-flex;align-items:center;padding:6px 10px;opacity:1}
+.nav a:not(.nav__name):hover{background:var(--line)}
+.nav a:not(.nav__name).is-active{background:var(--text);color:var(--bg)}
 
 /* centred name — sans, and it swaps out with the sidebar:
    visible only while the panel is closed */
-.nav__name{position:absolute;left:50%;top:50%;color:#fff;cursor:pointer;
+.nav__name{position:absolute;left:50%;top:50%;cursor:pointer;color:var(--text);
   font-family:var(--font-ui);font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;
   white-space:nowrap;pointer-events:auto;
   transform:translate(-50%,-50%);opacity:1;
   transition:opacity .3s var(--ease) .12s,transform .45s var(--ease)}
 body:not(.is-collapsed) .nav__name{
   opacity:0;pointer-events:none;transform:translate(-50%,-50%) translateY(-3px);transition-delay:0s}
-.nav__left{display:flex;align-items:center;gap:16px}
-.nav__links{display:flex;gap:16px}
+.nav__left{display:flex;align-items:center;gap:4px}
+.nav__links{display:flex;gap:4px}
 
 /* menu button — only exists while the sidebar is away.
    When the panel opens, this collapses out and the CLOSE button inside takes over. */
-.menu-btn{display:flex;align-items:center;gap:6px;flex:none;overflow:hidden;white-space:nowrap;
-  max-width:90px;padding:3px 8px 3px 6px;
-  border:1px solid rgba(255,255,255,.4);border-radius:2px;color:#fff;opacity:.75;
-  font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
-  transition:opacity .25s var(--ease),border-color .15s var(--ease),
-             max-width .45s var(--ease),padding .45s var(--ease),margin-right .45s var(--ease)}
-.menu-btn:hover{opacity:1;border-color:#fff}
+.menu-btn{display:flex;align-items:center;gap:6px;flex:none;overflow:hidden;white-space:nowrap;padding:6px 10px;border:0}
+.menu-btn:hover{background:var(--line)}
 body:not(.is-collapsed) .menu-btn{
   max-width:0;opacity:0;padding-left:0;padding-right:0;
-  border-color:transparent;margin-right:-16px;pointer-events:none}
+  background:transparent;margin-right:-16px;pointer-events:none}
 .menu-btn__bars{display:flex;flex-direction:column;gap:2px;width:10px;flex:none}
 .menu-btn__bars i{display:block;height:1px;background:currentColor}
 .menu-btn__bars i:nth-child(1){width:10px}
 .menu-btn__bars i:nth-child(2){width:6px}
 
-.theme-toggle{display:grid;place-items:center;width:26px;height:26px;
-  border:1px solid rgba(255,255,255,.4);border-radius:2px;color:#fff;opacity:.75;
-  transition:opacity .15s var(--ease),border-color .15s var(--ease)}
-.theme-toggle:hover{opacity:1;border-color:#fff}
+.theme-toggle{display:grid;place-items:center;width:28px;height:28px;flex:none;padding:0}
+.theme-toggle:hover{background:var(--line)}
 .theme-toggle svg{width:13px;height:13px;fill:none;stroke:currentColor;
   stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
 .theme-toggle .icon-moon{display:none}
@@ -291,6 +294,11 @@ body:not(.is-collapsed) .menu-btn{
 
 /* ============ WORK GRID ============ */
 .work{padding:0 var(--gutter) 80px}
+/* Each section wraps its own header + grid. This is what scopes the sticky
+   header: a sticky element only stays pinned while its parent is on screen,
+   so the header releases when its section ends and the next one takes over. */
+.work__section{position:relative}
+
 .section__head{position:sticky;top:39px;z-index:10;display:flex;align-items:baseline;
   justify-content:space-between;gap:16px;margin-top:40px;padding:9px 0;
   background:transparent;border-bottom:1px solid var(--line)}
