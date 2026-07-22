@@ -343,9 +343,6 @@ body:not(.is-collapsed) .menu-btn{
 .card__lockveil svg{width:20px;height:20px;fill:none;stroke:currentColor;
   stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
 .card--locked{cursor:pointer}
-.card--locked:hover .card__lockveil{color:var(--text)}
-.card--locked:hover .card__img{transform:none}
-.card--locked:hover .card__title{color:var(--muted)}
 .card__meta{display:flex;gap:6px;padding-top:6px;font-size:12px}
 .card__client{color:var(--text)}
 .card__title{color:var(--muted)}
