@@ -352,6 +352,8 @@ body:not(.is-collapsed) .menu-btn{
   transition:color .15s var(--ease),transform .15s var(--ease)}
 .card__ext svg{width:11px;height:11px}
 .card--ext-link:hover .card__ext{color:var(--text);transform:translate(1px,-1px)}
+.card__metalock{display:inline-grid;place-items:center;color:var(--muted);margin-left:-2px}
+.card__metalock svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.3}
 
 /* ============ PROJECT PAGE ============ */
 .project{padding:0 var(--gutter) 96px}
