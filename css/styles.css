@@ -337,11 +337,6 @@ body:not(.is-collapsed) .menu-btn{
 .card__tag--new{background:var(--text);color:var(--bg)}
 .card__tag--coming-soon{background:color-mix(in srgb,var(--bg) 55%,transparent);
   color:var(--text);border:1px solid var(--line)}
-.card__lockveil{position:absolute;inset:0;z-index:1;display:grid;place-items:center;
-  background:color-mix(in srgb,var(--surface) 78%,transparent);
-  color:var(--muted);backdrop-filter:blur(3px);transition:color .15s var(--ease)}
-.card__lockveil svg{width:20px;height:20px;fill:none;stroke:currentColor;
-  stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
 .card--locked{cursor:pointer}
 .card__meta{display:flex;gap:6px;padding-top:6px;font-size:12px}
 .card__client{color:var(--text)}
