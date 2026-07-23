@@ -583,6 +583,54 @@ function initPreloader(done){
   $(window).on('load', finish);            // backstop
 }
 
+/* ---------- work page filters ---------- */
+function initFilters(){
+  const $btns = $('.filter');
+  if(!$btns.length) return;
+  const cards = Array.from(document.querySelectorAll('#work .card'));
+
+  // count what sits behind each filter; hide any pill with nothing in it
+  $btns.each(function(){
+    const cat = this.dataset.cat;
+    const n = cat === 'all' ? cards.length
+      : cards.filter(c => (c.dataset.cats || '').split(' ').indexOf(cat) > -1).length;
+    $(this).find('.filter__count').text(String(n).padStart(2, '0'));
+    if(!n) $(this).hide();
+  });
+
+  function apply(cat){
+    $btns.each(function(){ $(this).toggleClass('is-on', this.dataset.cat === cat); });
+
+    cards.forEach(function(c){
+      const match = cat === 'all' || (c.dataset.cats || '').split(' ').indexOf(cat) > -1;
+      c.style.display = match ? '' : 'none';
+      c.classList.remove('is-in');
+    });
+
+    // fold away sections left with nothing, and update their counts
+    $('.work__section').each(function(){
+      const vis = Array.from(this.querySelectorAll('.card'))
+        .filter(c => c.style.display !== 'none').length;
+      $(this).toggleClass('is-empty', vis === 0);
+      $(this).find('.section__count').text(String(vis).padStart(2, '0'));
+    });
+
+    $('#filters-empty').toggleClass('hidden', cards.some(c => c.style.display !== 'none'));
+
+    // replay the entrance animation on whatever is now visible
+    requestAnimationFrame(function(){
+      let i = 0;
+      cards.forEach(function(c){
+        if(c.style.display === 'none') return;
+        setTimeout(function(){ c.classList.add('is-in'); }, (i % 4) * 55);
+        i++;
+      });
+    });
+  }
+
+  $btns.on('click', function(){ apply(this.dataset.cat); });
+}
+
 /* ===================== BOOT ===================== */
 /* Each step is isolated: if one throws, the rest still run and — crucially —
    the preloader still gets dismissed, so a bug can never hide the whole site. */
@@ -596,6 +644,7 @@ $(function(){
   safely('lock',      initLock);
   safely('cardHover', initCardHover);
   safely('accordion', initAccordion);
+  safely('filters',   initFilters);  
   safely('clock',     initClock);
   safely('shuffle',   initShuffle);
   safely('images',    paintPlaceholders);   // resolves data-img -> src
