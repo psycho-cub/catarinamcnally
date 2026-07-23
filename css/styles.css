@@ -350,6 +350,24 @@ body:not(.is-collapsed) .menu-btn{
 .card__metalock{display:inline-grid;place-items:center;color:var(--muted);margin-left:-2px}
 .card__metalock svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.3}
 
+/* ============ WORK FILTERS ============ */
+.filters{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:28px 0 4px}
+.filters__label{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--muted);margin-right:8px}
+.filter{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--text);background:var(--sidebar-bg);
+  border:0;border-radius:2px;padding:6px 10px;cursor:pointer;
+  transition:background .15s var(--ease),color .15s var(--ease)}
+.filter:hover{background:var(--line)}
+.filter.is-on{background:var(--line)}
+.filter__count{color:var(--muted);margin-left:5px}
+.filter__count::before{content:"["}
+.filter__count::after{content:"]"}
+.filter.is-on .filter__count{color:var(--text)}
+.work__section.is-empty{display:none}
+.filters__empty{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--muted);padding:40px 0}
+
 /* ============ PROJECT PAGE ============ */
 .project{padding:0 var(--gutter) 96px}
 .back{display:inline-flex;align-items:center;gap:5px;width:fit-content;cursor:pointer;
