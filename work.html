@@ -129,7 +129,19 @@
 </nav>
   <!-- Selected Work -->
   <div class="work" id="work">
-      
+
+      <div class="filters" id="filters">
+  <span class="filters__label">Filter by</span>
+  <button class="filter is-on" data-cat="all">All<span class="filter__count"></span></button>
+  <button class="filter" data-cat="identity">Identity<span class="filter__count"></span></button>
+  <button class="filter" data-cat="inhouse">In-house<span class="filter__count"></span></button>
+  <button class="filter" data-cat="art">Art Direction<span class="filter__count"></span></button>
+  <button class="filter" data-cat="web">Web<span class="filter__count"></span></button>
+  <button class="filter" data-cat="app">App<span class="filter__count"></span></button>
+  <button class="filter" data-cat="ai">AI Image Generation<span class="filter__count"></span></button>
+</div>
+<p class="filters__empty hidden" id="filters-empty">No projects in this category</p>
+     
       <section class="work__section">
 <header class="section__head" data-section="Freelance work">
         <h2 class="section__label">Freelance work</h2>
@@ -140,10 +152,8 @@
       </header>
       <div class="grid">
         
-         <a class="card" href="P01.html" data-frames="5" data-i="0">
+         <a class="card" href="P01.html" data-cats="identity art" data-frames="5" data-i="0">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Client One" alt="" decoding="async" loading="eager" fetchpriority="high" data-img="images/cards/luvie-img-1.webp"
                  data-video="images/cards/luvie-card.mp4">
           <span class="card__tag card__tag--new">New</span>
@@ -154,10 +164,8 @@
           </div>
         </a>
          
-        <a class="card" href="F2.html" data-frames="6" data-i="1">
+        <a class="card" href="F2.html" data-cats="identity art web" data-frames="6" data-i="1">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Client Two" alt="" decoding="async" loading="eager" fetchpriority="high" data-img="images/cards/ppf-img-1.webp"
                  data-video="images/cards/ppf-card.mp4">
           </div>
@@ -167,10 +175,8 @@
           </div>
         </a>
 
-        <a class="card" href="F3.html" data-frames="6" data-i="1">
+        <a class="card" href="F3.html" data-cats="identity art" data-frames="6" data-i="1">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Client Two" alt="" decoding="async" loading="eager" fetchpriority="high" data-img="images/cards/gliss-img-1.webp"
                  data-video="images/cards/gliss-card.mp4">
           </div>
@@ -180,10 +186,8 @@
           </div>
         </a>
          
-        <a class="card card--static card--soon" href="#" data-frames="7" data-i="2">
+        <a class="card card--static card--soon" href="#" data-cats="identity art web" data-frames="7" data-i="2">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Client Three" alt="" decoding="async" loading="eager" fetchpriority="high" data-img="images/cards/sasia-img-1.webp">
           <span class="card__tag card__tag--coming-soon">Coming Soon</span>
           </div>
@@ -193,10 +197,8 @@
           </div>
         </a>
          
-        <a class="card card--static card--soon" href="#" data-frames="8" data-i="3">
+        <a class="card card--static card--soon" href="#" data-cats="identity art web ai" data-frames="8" data-i="3">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Client Four" alt="" decoding="async" loading="eager" fetchpriority="high" data-img="images/cards/autopoiesis-img-1.webp">
           <span class="card__tag card__tag--coming-soon">Coming Soon</span>
           </div>
@@ -219,7 +221,7 @@
       </header>
       <div class="grid">
         
-         <a class="card" href="ih-01.html" data-lock="In-house" data-href="ih-01.html" data-frames="5" data-i="0">
+         <a class="card" href="ih-01.html" data-lock="In-house" data-href="ih-01.html" data-cats="inhouse ai" data-frames="5" data-i="0">
           <div class="card__frame">
             <img class="card__img" data-ph="4:3" data-ph-label="Company Name" alt="" decoding="async" loading="lazy" data-img="images/cards/algorand-img-1.webp"
                  data-video="images/cards/algorand-card.mp4">
@@ -232,10 +234,8 @@
           </div>
         </a>
 
-        <a class="card card--locked" href="ih2.html" data-lock="In-house" data-href="ih2.html" data-frames="5" data-i="0">
+        <a class="card card--locked" href="ih2.html" data-lock="In-house" data-href="ih2.html" data-cats="inhouse" data-frames="5" data-i="0">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Company Name" alt="" decoding="async" loading="lazy" data-img="images/cards/scarlet-img-1.webp"
                  data-video="images/cards/scarlet-card.mp4">
           <span class="card__tag card__tag--new">New</span>
@@ -247,10 +247,8 @@
           </div>
         </a>
          
-        <a class="card card--locked" href="ih3.html" data-lock="In-house" data-href="ih3.html" data-frames="6" data-i="1">
+        <a class="card card--locked" href="ih3.html" data-lock="In-house" data-href="ih3.html" data-cats="inhouse" data-frames="6" data-i="1">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Company Name" alt="" decoding="async" loading="lazy" data-img="images/cards/Cravings-img-1.webp"
                  data-video="images/cards/cravings-card.mp4">
           </div>
@@ -261,10 +259,8 @@
           </div>
         </a>
          
-        <a class="card card--locked" href="ih4.html" data-lock="In-house" data-href="ih4.html" data-frames="7" data-i="2">
+        <a class="card card--locked" href="ih4.html" data-lock="In-house" data-href="ih4.html" data-cats="identity inhouse" data-frames="7" data-i="2">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Company Name" alt="" decoding="async" loading="lazy" data-img="images/cards/soma-img-1.webp"
                  data-video="images/cards/soma-card.mp4">
           </div>
@@ -274,10 +270,8 @@
           </div>
         </a>
          
-        <a class="card card--locked" href="ih5.html" data-lock="In-house" data-href="ih5.html" data-frames="8" data-i="3">
+        <a class="card card--locked" href="ih5.html" data-lock="In-house" data-href="ih5.html" data-cats="identity inhouse" data-frames="8" data-i="3">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Company Name" alt="" decoding="async" loading="lazy" data-img="images/cards/whitekube-img-1.webp"
                  data-video="images/cards/whitekube-card.mp4">
           </div>
@@ -300,10 +294,8 @@
       </header>
       <div class="grid">
         
-         <a class="card card--static card--soon" href="#" data-frames="5" data-i="0">
+         <a class="card card--static card--soon" href="#" data-cats="identity art app" data-frames="5" data-i="0">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Self-initiated" alt="" decoding="async" loading="lazy" data-img="images/cards/anima-img-1.webp">
           <span class="card__tag card__tag--coming-soon">Coming Soon</span>
           </div>
@@ -313,10 +305,8 @@
           </div>
         </a>
          
-        <a class="card" href="pp-02.html" data-frames="6" data-i="1">
+        <a class="card" href="pp-02.html" data-cats="identity art ai" data-frames="6" data-i="1">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Self-initiated" alt="" decoding="async" loading="lazy" data-img="images/cards/rudeolive-img-1.webp"
                  data-video="images/cards/rudeolive-card.mp4">
           </div>
@@ -326,10 +316,8 @@
           </div>
         </a>
          
-        <a class="card" href="pp-03.html" data-frames="7" data-i="2">
+        <a class="card" href="pp-03.html" data-cats="identity art ai" data-frames="7" data-i="2">
           <div class="card__frame">
-            <!-- MEDIA: data-img = the still · data-video = the loop played on hover
-                 (frames still work too: data-imgs="images/a.jpg,images/b.jpg") -->
             <img class="card__img" data-ph="4:3" data-ph-label="Self-initiated" alt="" decoding="async" loading="lazy" data-img="images/cards/paloma-img-1.webp"
                  data-video="images/cards/paloma-card.mp4">
           </div>
