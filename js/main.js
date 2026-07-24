@@ -55,8 +55,17 @@ function imageFor($img){
   return placeholder($img.data('ph'), $img.data('ph-label'));
 }
 function framesFor($img, count){
+  // real frames, if given
   const list = (imgAttr($img, 'data-imgs') || '').split(',').map(s => s.trim()).filter(Boolean);
   if(list.length) return list;
+
+  // A card showing a REAL image but with no frames listed should stay static —
+  // otherwise a leftover data-frames would animate it through grey placeholders.
+  const cur = $img.attr('src');
+  const hasReal = imgAttr($img, 'data-img') || (cur && cur.indexOf('data:') !== 0);
+  if(hasReal) return [];
+
+  // placeholder cards only: invent some frames so the demo still animates
   const ratio = $img.data('ph'), label = $img.data('ph-label');
   const out = [];
   for(let f = 0; f < count; f++) out.push(placeholder(ratio, label, f));
